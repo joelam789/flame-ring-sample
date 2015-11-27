@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd">
+        
+    <!-- Ignite settings -->
+    <bean id="ignite.cfg" class="org.apache.ignite.configuration.IgniteConfiguration">
+        
+        <!-- These are very important settings for our framework -->
+        <property name="userAttributes">
+			<map>
+				<entry key="ring-type" value="lobby"/>
+				<entry key="ring-name" value="lobby1"/>
+			</map>
+		</property>
+		
+		<!-- would use slf4j -->
+		<property name="gridLogger">
+			<bean class="org.apache.ignite.logger.slf4j.Slf4jLogger"/>
+		</property>
+		
+        <!-- Set cache -->
+		<property name="cacheConfiguration">
+			<list>  
+			    <bean class="org.apache.ignite.configuration.CacheConfiguration">
+				    <property name="name" value="room-summary"/>
+		            <property name="cacheMode" value="REPLICATED"/>
+			        <property name="atomicityMode" value="TRANSACTIONAL"/>
+			    </bean>
+			    
+			    <bean class="org.apache.ignite.configuration.CacheConfiguration">
+				    <property name="name" value="chat-room"/>
+		            <property name="cacheMode" value="REPLICATED"/>
+			        <property name="atomicityMode" value="TRANSACTIONAL"/>
+			    </bean>
+			    
+			    <bean class="org.apache.ignite.configuration.CacheConfiguration">
+				    <property name="name" value="chat-session"/>
+		            <property name="cacheMode" value="REPLICATED"/>
+			        <property name="atomicityMode" value="TRANSACTIONAL"/>
+			        
+			        <property name="typeMetadata">
+				        <list>
+							<bean class="org.apache.ignite.cache.CacheTypeMetadata">
+							<property name="valueType" value="org.flamering.sample.chat.data.ChatSession"/>
+								<property name="queryFields">
+									<map>
+										<entry key="userName" value="java.lang.String"/>
+										<entry key="userRole" value="java.lang.String"/>
+										<entry key="userToken" value="java.lang.String"/>
+										<entry key="roomName" value="java.lang.String"/>
+										<entry key="serverName" value="java.lang.String"/>
+										<entry key="sessionName" value="java.lang.String"/>
+										<entry key="remoteAddress" value="java.lang.String"/>
+									</map>
+								</property>
+								<property name="ascendingFields">
+									<map>
+										<entry key="userName" value="java.lang.String"/>
+										<entry key="sessionName" value="java.lang.String"/>
+									</map>
+								</property>
+							</bean>
+						</list>
+			        </property>
+			         
+			        <!-- 
+			        <property name="expiryPolicyFactory">
+				        <bean id="expiryPolicy" class="javax.cache.expiry.ModifiedExpiryPolicy" factory-method="factoryOf">
+					        <constructor-arg>
+						        <bean class="javax.cache.expiry.Duration">
+							        <constructor-arg value="SECONDS"/>
+							        <constructor-arg value="180"/>
+						        </bean>
+					        </constructor-arg>
+				        </bean>
+			        </property>
+			        -->
+			        
+			    </bean>
+			    
+		    </list>
+		</property>
+        
+
+        <!-- Explicitly configure TCP discovery SPI to provide list of initial nodes. -->
+        <property name="discoverySpi">
+            <bean class="org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi">
+                <property name="ipFinder">
+                    <bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.multicast.TcpDiscoveryMulticastIpFinder">
+                        <property name="addresses">
+                            <list>
+                                <!-- In distributed environment, replace with actual host IP address. -->
+                                <value>127.0.0.1:47500..47505</value>
+								<value>192.168.0.102:47500..47505</value>
+                            </list>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        
+    </bean> 
+    
+</beans>

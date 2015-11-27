@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd">
+        
+    <!-- general application settings -->
+	<bean id="app-settings" class="org.flamering.app.AppSettings">
+		<property name="cmds">
+			<map>
+				<entry key="help" value="List all commands" />
+				<entry key="quit" value="Exit program" />
+				<entry key="state" value="Show server state" />
+				<entry key="version" value="Show server version" />
+				<entry key="edge" value="Show edge server state" />
+			</map>
+		</property>
+		<property name="params">
+			<map>
+				<entry key="appName" value="ServerTestApp" />
+				<entry key="appTitle" value="Flame Ring Server Console Application" />
+				<entry key="appVersion" value="0.0.1" />
+				<entry key="appInfo" value="A Console Sample For Flame Ring Framework" />
+			</map>
+		</property>
+		<property name="extra">
+			<map>
+				<entry key="group-edge" value="edge" />
+				<entry key="group-login" value="login" />
+				<entry key="group-lobby" value="lobby" />
+				<entry key="group-room" value="room" />
+			</map>
+		</property>
+		<property name="gridConfigFile" value="grid-login.xml" />
+	</bean>
+	<bean id="app-events" class="org.flamering.app.AppEvents"/>
+	
+	<!-- thread pool settings -->
+	<bean id="service-executor" class="org.flamering.service.ServiceExecutor">
+		<property name="minThreadPoolSize" value="128" />
+		<property name="maxThreadPoolSize" value="2048" />
+		<property name="threadQueueSize" value="8192" />
+		<property name="threadMaxIdleTime" value="180" />
+    </bean>
+    
+    <!-- http and websocket settings (for vert.x) -->
+    <bean id="network-manager" class="org.flamering.component.Network">
+		<property name="httpRoot" value="" />
+		<property name="httpPort" value="11091" />
+		<property name="httpIdleTimeout" value="300" />
+		<property name="webSocketRoot" value="" />
+		<property name="webSocketPort" value="0" />
+		<property name="webSocketIdleTimeout" value="300" />
+    </bean>
+    
+    <!-- internal services -->
+    <bean id="network-service" class="org.flamering.service.NetworkService">
+    	<property name="address" value="192.168.0.102"/>
+    </bean>
+    <bean id="network-event-service" class="org.flamering.sample.chat.common.NetworkEventHandler"/>
+    
+    <!-- RESTful services (external services) exposed to clients directly -->
+    <bean id="service-settings" class="org.flamering.service.ServiceSettings">
+		<property name="serviceMap">
+			<map>
+				<entry key="login" value="login::login-service" />
+				<entry key="lobby" value="lobby::lobby-service" />
+				<entry key="room" value="room::room-service" />
+			</map>
+		</property>
+    </bean>
+    
+    <bean id="login-service" class="org.flamering.sample.chat.login.LoginService">
+		<property name="functionMap">
+			<map>	 
+				<entry key="login" value="login" />
+			</map>
+		</property>
+    </bean>
+    
+    
+</beans>
