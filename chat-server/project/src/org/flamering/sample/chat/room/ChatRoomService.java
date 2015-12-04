@@ -443,7 +443,7 @@ public class ChatRoomService extends BaseService {
 					String[] arraySessionNames = new String[]{userSessionName};
 					msg.setEndpoints(Arrays.asList(arraySessionNames));
 					
-					Grid.run(NetworkService.SERVICE_NAME, NetworkService.FUNC_SEND, msg, 
+					Grid.run(NetworkService.BEAN_NAME, NetworkService.FUNC_SEND, msg, 
 							Grid.getGroupByName(userServerName));
 				}
 				
@@ -461,7 +461,7 @@ public class ChatRoomService extends BaseService {
 						String[] arraySessionNames = new String[]{targetSessionName};
 						msg.setEndpoints(Arrays.asList(arraySessionNames));
 						
-						Grid.run(NetworkService.SERVICE_NAME, NetworkService.FUNC_SEND, msg, 
+						Grid.run(NetworkService.BEAN_NAME, NetworkService.FUNC_SEND, msg, 
 								Grid.getGroupByName(targetServerName));
 					}
 					
@@ -476,7 +476,7 @@ public class ChatRoomService extends BaseService {
 					msg.setMessage(Json.toJsonString(reply));
 					msg.setEndpoints(sessionNames);
 					
-					Grid.broadcast(NetworkService.SERVICE_NAME, NetworkService.FUNC_SEND, msg, 
+					Grid.broadcast(NetworkService.BEAN_NAME, NetworkService.FUNC_SEND, msg, 
 							Grid.getGroup(ChatServerApp.getServerGroupName("group-edge")));
 					
 				}
@@ -508,7 +508,7 @@ public class ChatRoomService extends BaseService {
 			msg.setMessage(Json.toJsonString(reply));
 			msg.setEndpoints(sessionNames);
 			
-			Grid.broadcast(NetworkService.SERVICE_NAME, NetworkService.FUNC_SEND, msg, 
+			Grid.broadcast(NetworkService.BEAN_NAME, NetworkService.FUNC_SEND, msg, 
 					Grid.getGroup(ChatServerApp.getServerGroupName("group-edge")));
 			
 		}

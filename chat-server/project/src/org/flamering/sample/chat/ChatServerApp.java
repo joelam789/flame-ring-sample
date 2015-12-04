@@ -19,8 +19,8 @@ public class ChatServerApp extends ConsoleApp {
 		Collection<ClusterNode> nodes = Grid.getGroup(getServerGroupName("group-edge")).nodes();
 		for (ClusterNode node : nodes) {
 			String nodeName = node.attributes().get(Grid.NODE_NAME).toString();
-			String serviceAddress = Grid.call(NetworkService.SERVICE_NAME, NetworkService.FUNC_SERVICE_ADDRESS, "", Grid.getGroupByName(nodeName));
-			String clientCount = Grid.call(NetworkService.SERVICE_NAME, NetworkService.FUNC_CLIENT_COUNT, "", Grid.getGroupByName(nodeName));
+			String serviceAddress = Grid.call(NetworkService.BEAN_NAME, NetworkService.FUNC_SERVICE_ADDRESS, "", Grid.getGroupByName(nodeName));
+			String clientCount = Grid.call(NetworkService.BEAN_NAME, NetworkService.FUNC_CLIENT_COUNT, "", Grid.getGroupByName(nodeName));
 			result += nodeName + ", " +  serviceAddress + ", " + clientCount + "\n";
 		}
 		return result;
@@ -34,6 +34,8 @@ public class ChatServerApp extends ConsoleApp {
 		
 		ConsoleApp app = new ChatServerApp();
 		if (app.init(args) >= 0) app.run();
+		
+		System.exit(0);
 		
 	}
 

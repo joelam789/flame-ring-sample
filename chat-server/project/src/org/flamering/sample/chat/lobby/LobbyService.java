@@ -22,9 +22,9 @@ import org.flamering.sample.chat.lobby.message.GetRoomListRequest;
 
 public class LobbyService extends BaseService {
 	
-	public EnterLobbyReply enter(EnterLobbyRequest request, String requesterInfo) {
+	public EnterLobbyReply enter(EnterLobbyRequest request, ServiceRequester requester) {
 		
-		System.out.println("Got enter-lobby request from " + requesterInfo);
+		System.out.println("Got enter-lobby request from " + requester.getRemoteAddress() + " (" + requester.getProtocol() + ")");
 		
 		EnterLobbyReply reply = new EnterLobbyReply();
 		
@@ -53,7 +53,6 @@ public class LobbyService extends BaseService {
 						String sessionName = userSession.getSessionName();
 						String roomName = userSession.getRoomName();
 						
-						ServiceRequester requester = new ServiceRequester(requesterInfo);
 						userSession.setRemoteAddress(requester.getRemoteAddress());
 						userSession.setServerName(requester.getServerName());
 						userSession.setSessionName(requester.getSessionName());

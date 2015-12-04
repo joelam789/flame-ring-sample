@@ -10,6 +10,7 @@ import org.apache.ignite.IgniteCache;
 import org.flamering.component.Grid;
 import org.flamering.service.BaseService;
 import org.flamering.service.NetworkService;
+import org.flamering.service.ServiceRequester;
 
 import org.flamering.sample.chat.ChatServerApp;
 import org.flamering.sample.chat.data.ChatSession;
@@ -24,9 +25,9 @@ public class LoginService extends BaseService {
 		return userName != null && userName.length() > 0; // skip checking password since it is just a demo
 	}
 
-	public LoginReply login(LoginRequest request, String requesterInfo) {
+	public LoginReply login(LoginRequest request, ServiceRequester requester) {
 		
-		System.out.println("Got login request from " + requesterInfo);
+		System.out.println("Got login request from " + requester.getRemoteAddress() + " (" + requester.getProtocol() + ")");
 		
 		LoginReply reply = new LoginReply();
 		
@@ -127,7 +128,7 @@ public class LoginService extends BaseService {
 				
 				reply.setResult("ok");
 				
-				reply.setServerUri(Grid.call(NetworkService.SERVICE_NAME, NetworkService.FUNC_SERVICE_ADDRESS, "", 
+				reply.setServerUri(Grid.call(NetworkService.BEAN_NAME, NetworkService.FUNC_SERVICE_ADDRESS, "", 
 						Grid.getGroup(ChatServerApp.getServerGroupName("group-edge")).forRandom()));
 				
 				reply.setUserToken(session.getUserToken());
@@ -148,7 +149,7 @@ public class LoginService extends BaseService {
 		// (this could be a reasonable logic as long as the user name could be protected by password)
 		if (serverName != null && serverName.length() > 0
 				&& sessionName != null && sessionName.length() > 0) {
-			Grid.run(NetworkService.SERVICE_NAME, NetworkService.FUNC_DISCONNECT, sessionName, 
+			Grid.run(NetworkService.BEAN_NAME, NetworkService.FUNC_DISCONNECT, sessionName, 
 					Grid.getGroupByName(serverName));
 		}
 		

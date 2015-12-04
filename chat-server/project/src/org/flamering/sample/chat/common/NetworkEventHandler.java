@@ -10,12 +10,17 @@ import org.apache.ignite.cache.query.SqlQuery;
 
 import org.flamering.component.Grid;
 import org.flamering.service.NetworkEventService;
-
 import org.flamering.sample.chat.ChatServerApp;
 import org.flamering.sample.chat.data.ChatSession;
 import org.flamering.sample.chat.login.message.LogoutRequest;
 
 public class NetworkEventHandler extends NetworkEventService {
+	
+	@Override
+	public String onOpen(String sessionName, String remoteAddress) {
+		System.out.println(new Date().toString() + " - New client connected: " + sessionName + "," + remoteAddress);
+		return "";
+	}
 	
 	@Override
 	public String onClose(String sessionName, String remoteAddress) {
