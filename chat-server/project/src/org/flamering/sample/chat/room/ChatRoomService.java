@@ -106,10 +106,7 @@ public class ChatRoomService extends BaseService {
 					}
 					
 					ChatSession userSession = sessionCache.get(userName); // reload it to make sure what we get is the latest one
-					if (userSession != null) {
-						userSession.setRoomName(roomName);
-						session.setRoomName(sessionCache.get(userName).getRoomName()); // need to reload? should be a bug ...
-					}
+					if (userSession != null) userSession.setRoomName(roomName);
 					if (userSession == null || !sessionCache.replace(userName, session, userSession)) {
 						reply.setResult("User session data is not in sync.");
 						return reply;
@@ -230,10 +227,7 @@ public class ChatRoomService extends BaseService {
 					
 					
 					ChatSession userSession = sessionCache.get(userName); // reload it to make sure what we get is the latest one
-					if (userSession != null) {
-						userSession.setRoomName(roomName);
-						session.setRoomName(sessionCache.get(userName).getRoomName()); // need to reload? should be a bug ...
-					}
+					if (userSession != null) userSession.setRoomName(roomName);
 					if (userSession == null || !sessionCache.replace(userName, session, userSession)) {
 						reply.setResult("User session data is not in sync.");
 						return reply;
@@ -340,10 +334,7 @@ public class ChatRoomService extends BaseService {
 					
 					
 					ChatSession userSession = sessionCache.get(userName); // reload it to make sure what we get is the latest one
-					if (userSession != null) {
-						userSession.setRoomName("");
-						session.setRoomName(sessionCache.get(userName).getRoomName()); // need to reload? should be a bug ...
-					}
+					if (userSession != null) userSession.setRoomName("");
 					if (userSession == null || !sessionCache.replace(userName, session, userSession)) {
 						reply.setResult("User session data is not in sync.");
 						return reply;
