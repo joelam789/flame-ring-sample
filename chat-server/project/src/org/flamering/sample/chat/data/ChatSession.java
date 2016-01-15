@@ -7,7 +7,12 @@ import java.io.ObjectOutput;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-public class ChatSession implements Externalizable {
+import org.apache.ignite.binary.BinaryObjectException;
+import org.apache.ignite.binary.BinaryReader;
+import org.apache.ignite.binary.BinaryWriter;
+import org.apache.ignite.binary.Binarylizable;
+
+public class ChatSession implements Binarylizable, Externalizable {
 
 	private String userName = "";
 	
@@ -79,7 +84,7 @@ public class ChatSession implements Externalizable {
 	public void setRemoteAddress(String remoteAddress) {
 		this.remoteAddress = remoteAddress;
 	}
-
+	
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
 		// TODO Auto-generated method stub
@@ -102,6 +107,30 @@ public class ChatSession implements Externalizable {
         this.serverName = (String)in.readObject();
         this.sessionName = (String)in.readObject();
         this.remoteAddress = (String)in.readObject();
+	}
+	
+	@Override
+	public void writeBinary(BinaryWriter writer) throws BinaryObjectException {
+		// TODO Auto-generated method stub
+		writer.writeString("userName", this.userName);
+		writer.writeString("userRole", this.userRole);
+		writer.writeString("userToken", this.userToken);
+		writer.writeString("roomName", this.roomName);
+		writer.writeString("serverName", this.serverName);
+		writer.writeString("sessionName", this.sessionName);
+		writer.writeString("remoteAddress", this.remoteAddress);
+	}
+
+	@Override
+	public void readBinary(BinaryReader reader) throws BinaryObjectException {
+		// TODO Auto-generated method stub
+		this.userName = reader.readString("userName");
+        this.userRole = reader.readString("userRole");
+        this.userToken = reader.readString("userToken");
+        this.roomName = reader.readString("roomName");
+        this.serverName = reader.readString("serverName");
+        this.sessionName = reader.readString("sessionName");
+        this.remoteAddress = reader.readString("remoteAddress");
 	}
 	
 	@Override

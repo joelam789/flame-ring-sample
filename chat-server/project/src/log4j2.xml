@@ -7,7 +7,7 @@
 	</Appenders>
 	<Loggers>
 	<Logger name="org.springframework" level="WARN"/>
-	<Logger name="org.apache.ignite" level="ERROR"/>
+	<Logger name="org.apache.ignite" level="WARN"/>
 	<Root level="WARN">
 		<AppenderRef ref="Console"/>
 	</Root>
