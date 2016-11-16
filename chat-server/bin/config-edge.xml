@@ -56,6 +56,9 @@
 		<property name="webSocketRoot" value="" />
 		<property name="webSocketPort" value="11092" />
 		<property name="webSocketIdleTimeout" value="300" />
+		<!-- set keystore file if need SSL -->
+		<!-- <property name="webSocketKeyStorePath" value="server-keystore.jks" /> -->
+		<!-- <property name="webSocketKeyStorePassword" value="password" /> -->
     </bean>
     
     <!-- internal services -->

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Security;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -336,7 +337,7 @@ namespace SampleChatClient
                             m_UserName = userName;
                             m_UserToken = reply.UserToken;
 
-                            m_Client.Open("ws://" + reply.ServerUri);
+                            m_Client.Open((m_Client.HasValidationCallback() ? "wss://" : "ws://") + reply.ServerUri);
 
                             return "";
                         }
@@ -400,6 +401,12 @@ namespace SampleChatClient
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            //ServicePointManager.ServerCertificateValidationCallback += (from, cert, chain, sslPolicyErrors) => 
+            //{
+            //    LogMsg("HTTP Remote Certificate Validation Callback!");
+            //    return true; 
+            //};
+
             m_Client = MessageClient.CreateNewClient();
 
             m_Client.SetClientId(1);
@@ -408,6 +415,12 @@ namespace SampleChatClient
             m_Client.Events.OnHandshake += OnConnect;
             m_Client.Events.OnDisconnect += OnDisconnect;
             m_Client.Events.OnError += OnError;
+
+            //m_Client.SetValidationCallback(new RemoteCertificateValidationCallback((from, cert, chain, policyErrors) => 
+            //{
+            //    LogMsg("WebSocket Remote Certificate Validation Callback!");
+            //    return true; 
+            //}));
 
             m_Client.Handlers.AddHandler(new EnterLobbyHandler(this));
             m_Client.Handlers.AddHandler(new GetRoomListHandler(this));

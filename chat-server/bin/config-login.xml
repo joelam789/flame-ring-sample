@@ -53,6 +53,9 @@
 		<property name="httpRoot" value="" />
 		<property name="httpPort" value="11091" />
 		<property name="httpIdleTimeout" value="300" />
+		<!-- set keystore file if need SSL -->
+		<!-- <property name="httpKeyStorePath" value="server-keystore.jks" /> -->
+		<!-- <property name="httpKeyStorePassword" value="password" /> -->
 		<property name="webSocketRoot" value="" />
 		<property name="webSocketPort" value="0" />
 		<property name="webSocketIdleTimeout" value="300" />

@@ -42,11 +42,13 @@
     <Reference Include="ParallelExtensionsExtras">
       <HintPath>..\Lib\ParallelExtensionsExtras.dll</HintPath>
     </Reference>
-    <Reference Include="SharpNetwork">
+    <Reference Include="SharpNetwork, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\SharpNetwork.dll</HintPath>
     </Reference>
-    <Reference Include="SimpleWebSocket">
-      <HintPath>..\Lib\SimpleWebSocket.dll</HintPath>
+    <Reference Include="SharpNetwork.SimpleWebSocket, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\SharpNetwork.SimpleWebSocket.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
