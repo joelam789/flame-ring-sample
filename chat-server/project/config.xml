@@ -53,6 +53,7 @@
 		<property name="httpRoot" value="" />
 		<property name="httpPort" value="11091" />
 		<property name="httpIdleTimeout" value="300" />
+		<property name="httpAllowOrigin" value="*" />
 		<property name="webSocketRoot" value="" />
 		<property name="webSocketPort" value="11092" />
 		<property name="webSocketIdleTimeout" value="300" />
