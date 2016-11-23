@@ -1,0 +1,44 @@
+
+{
+    "topbar": {
+        "username": "用户",
+        "chatroom": "聊天室",
+        "lobby": "聊天大厅",
+        "logout": "登出",
+        "flag-img": "./img/flags/china.png",
+        "language": "语言",
+        "english": "英文",
+        "chinese": "中文"
+    },
+
+    "login": {
+        "user": "用户",
+        "password": "密码",
+        "entry": "服务器",
+        "login": "登入",
+        "title": "用户登入"
+    },
+
+    "lobby": {
+        "enter": "进入",
+        "total": "聊天人数",
+        "create": "创建新聊天室",
+        "newname": "新聊天室名称",
+
+        "ok": "确定",
+        "cancel": "取消"
+    },
+
+    "chatroom": {
+        "system": "【系统消息】",
+        "all":"【全部人】",
+        "private": "私聊",
+        "messages": "聊天信息",
+        "users": "在线用户",
+        "input": "信息输入",
+        "send": "发送",
+        "to": "对",
+        "you": "你"
+        
+    }
+}

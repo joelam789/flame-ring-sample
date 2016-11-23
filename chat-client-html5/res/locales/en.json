@@ -1,0 +1,43 @@
+
+{
+    "topbar": {
+        "username": "User",
+        "chatroom": "Chatroom",
+        "lobby": "Lobby",
+        "logout": "Logout",
+        "flag-img": "./img/flags/uk.png",
+        "language": "Language",
+        "english": "English",
+        "chinese": "Chinese"
+    },
+
+    "login": {
+        "user": "User Name",
+        "password": "Password",
+        "entry": "Server",
+        "login": "Login",
+        "title": "Login"
+    },
+
+    "lobby": {
+        "enter": "Enter",
+        "total": "Number of users",
+        "create": "Create new chatroom",
+        "newname": "New Chatroom Name",
+        
+        "ok": "OK",
+        "cancel": "Cancel"
+    },
+
+    "chatroom": {
+        "system": "[SYSTEM]",
+        "all":"[ALL]",
+        "private": "Private",
+        "messages": "Messages",
+        "users": "Users",
+        "input": "Input",
+        "send": "Send",
+        "to": "to",
+        "you": "you"
+    }
+}

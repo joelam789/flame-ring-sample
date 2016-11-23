@@ -1,0 +1,17 @@
+{
+  "globalDependencies": {
+    "core-js": "registry:dt/core-js#0.0.0+20160914114559",
+    "i18next": "registry:dt/i18next#2.3.4+20161107200623",
+    "i18next-xhr-backend": "registry:dt/i18next-xhr-backend#1.2.0+20160921203958",
+    "jquery": "registry:dt/jquery#1.10.0+20160929162922",
+    "nprogress": "registry:dt/nprogress#0.0.0+20161003122759"
+  },
+  "dependencies": {
+    "aurelia-bootstrapper": "npm:aurelia-bootstrapper",
+    "aurelia-dialog": "github:aurelia/dialog",
+    "aurelia-event-aggregator": "npm:aurelia-event-aggregator",
+    "aurelia-framework": "npm:aurelia-framework",
+    "aurelia-i18n": "github:aurelia/i18n",
+    "aurelia-router": "npm:aurelia-router"
+  }
+}

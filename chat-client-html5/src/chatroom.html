@@ -1,0 +1,141 @@
+<template>
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#/chatroom" click.delegate="exitRoom()"><span i18n="topbar.lobby">Lobby</span></a>
+        </div>
+
+        <div class="collapse navbar-collapse center-block" id="navbar-ex-collapse">
+
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                 <img i18n="topbar.flag-img"/>&nbsp;<span i18n="topbar.language">Language</span>&nbsp;<span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a href="#/chatroom" click.delegate="changeLang('en')" i18n="topbar.english">English</a></li>
+                <li><a href="#/chatroom" click.delegate="changeLang('zh')" i18n="topbar.chinese">Chinese</a></li>
+              </ul>
+            </li>
+          </ul>
+
+          <form class="navbar-form navbar-left" role="search">
+            <div class="form-group">
+              <label class="control-label" i18n="topbar.username">User</label>
+              <input type="text" class="form-control input-md" style="width: 130px" placeholder="" value.bind="userName" disabled>
+            </div>&nbsp;&nbsp;
+            <div class="form-group">
+              <label class="control-label" i18n="topbar.chatroom">Chatroom</label>
+              <input type="text" class="form-control input-md" style="width: 130px" placeholder="" value.bind="roomName" disabled>
+            </div>
+          </form>
+
+        </div>
+
+      </div>
+    </nav>
+
+    <div class="section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                <h3 class="panel-title" i18n="chatroom.messages">Messages</h3>
+              </div>
+              <div class="panel-body" id="chatbox" style="min-height: 480px; max-height: 480px; overflow-y: auto;">
+                <ul class="list-group">
+                  <template repeat.for="item of chatHistory">
+                  <li if.bind="item.fromSystem" class="list-group-item list-group-item-info">
+                    <h4 class="list-group-item-heading" i18n="chatroom.system">[SYSTEM]</h4>
+                    <p class="list-group-item-text">${item.words}</p>
+                  </li>
+                  <li if.bind="!item.fromSystem && item.user != userName && item.target != userName" class="list-group-item">
+                    <h4 if.bind="item.target.length <= 0" class="list-group-item-heading">${item.user}</h4>
+                    <h4 if.bind="item.target.length > 0" class="list-group-item-heading">${item.user}&nbsp;<span i18n="chatroom.to">TO</span>&nbsp;${item.target}</h4>
+                    <p class="list-group-item-text">${item.words}</p>
+                  </li>
+                  <li if.bind="!item.fromSystem && (item.user == userName || item.target == userName) && !item.isPrivate" class="list-group-item list-group-item-success">
+                    <h4 if.bind="item.user == userName" class="list-group-item-heading"><span i18n="chatroom.you">YOU</span>&nbsp;<span if.bind="item.target.length > 0" i18n="chatroom.to">TO</span>&nbsp;${item.target}</h4>
+                    <h4 if.bind="item.target == userName && item.user != userName" class="list-group-item-heading">${item.user}&nbsp;<span i18n="chatroom.to">TO</span>&nbsp;<span i18n="chatroom.you">YOU</span></h4>
+                    <p class="list-group-item-text">${item.words}</p>
+                  </li>
+                  <li if.bind="!item.fromSystem && (item.user == userName || item.target == userName) && item.isPrivate" class="list-group-item list-group-item-danger">
+                    <h4 if.bind="item.user == userName" class="list-group-item-heading"><span i18n="chatroom.you">YOU</span>&nbsp;<span if.bind="item.target.length > 0" i18n="chatroom.to">TO</span>&nbsp;${item.target}</h4>
+                    <h4 if.bind="item.target == userName && item.user != userName" class="list-group-item-heading">${item.user}&nbsp;<span i18n="chatroom.to">TO</span>&nbsp;<span i18n="chatroom.you">YOU</span></h4>
+                    <p class="list-group-item-text">${item.words}</p>
+                  </li>
+                  </template>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                <h3 class="panel-title" i18n="chatroom.users">Users</h3>
+              </div>
+              <div class="panel-body" style="min-height: 480px; max-height: 480px; overflow-y: auto;">
+                <div class="list-group">
+                  <a repeat.for="item of users" href="#/chatroom" click.delegate="selectUser($index)"
+                    class="${$parent.selectedUser == item ? 'item list-group-item active' : 'item list-group-item'}">
+                    <span if.bind="item == $parent.userName"><b>${$index == 0 ? tagForAnyone : item}</b></span>
+                    <span if.bind="item != $parent.userName">${$index == 0 ? tagForAnyone : item}</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                <h3 class="panel-title" i18n="chatroom.input">Input</h3>
+              </div>
+              <div class="panel-body">
+                <div class="row">
+                  <div class="col-md-2">
+                      <select value.bind="selectedUser" class="form-control">
+                        <option repeat.for="item of users" value.bind="item">${$index == 0 ? tagForAnyone : item}</option>
+                      </select>
+                  </div>
+                  <div class="col-md-8">
+                    <input type="text" class="form-control" placeholder="message" value.bind="chatMessage">
+                  </div>
+                  <div class="col-md-1">
+                    <div class="checkbox">
+                      <label><input type="checkbox" value="private" checked.bind="selectedChatFlags"><span i18n="chatroom.private">Private</span></label>
+                    </div>
+                  </div>
+                  <div class="col-md-1">
+                    <button class="btn btn-success" click.trigger="sendChatMessage()" i18n="chatroom.send"
+                    disabled.bind="!canSendChatMessage">Send</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section container">
+        <div class="row">&nbsp;</div>
+        <div class="row">
+            <div class="alert alert-danger alert-dismissible fade-in" show.bind="!isEmptyAlertMessage" role="alert">
+                <button type="button" class="close" click.delegate="dismissAlertMessage()" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <strong>Error: </strong> ${alertMessage}
+            </div>
+        </div>
+    </div>
+
+</template>

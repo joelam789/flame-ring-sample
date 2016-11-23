@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chatroom</title>
+    </head>
+
+    <body>
+
+        <script src="jspm_packages/system.js"></script>
+        <script src="config.js"></script>
+
+        <!-- actually you could install jquery and bootstrap by jspm, too -->
+        <!-- this is just an example to show you how to include 3rd-party js libs directly -->
+        <script src="js/jquery-3.1.1.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+
+        <!-- our global app config -->
+        <script src="js/app-config.js"></script>
+
+        <script>
+            
+            // we would try to load correct theme (css) by url params
+            function getUrlParamByName(name, url) {
+                if (!url) url = window.location.href;
+                name = name.replace(/[\[\]]/g, "\\$&");
+                var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+                var results = regex.exec(url);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, " "));
+            }
+
+            // load global theme (css)
+            var dochead = document.head || document.getElementsByTagName('head')[0];
+            var linkelement = document.createElement('link');
+            linkelement.type = 'text/css';
+            linkelement.rel = 'stylesheet';
+            linkelement.href = 'css/bootstrap.min.css'; // default css
+            var themeNameFromUrl = getUrlParamByName('theme');
+            if (themeNameFromUrl != null && themeNameFromUrl.length > 0)
+                linkelement.href = 'css/bootstrap-' + themeNameFromUrl + '.min.css';
+            dochead.appendChild(linkelement);
+
+            // window's onload event...
+            window.onload = function() {
+
+                // load aurelia framework
+                var approotdir = "";
+                if (window.mainAppConfig.rootDir != undefined && window.mainAppConfig.rootDir != null
+			        && window.mainAppConfig.rootDir.length > 0 && window.mainAppConfig.rootDir != ".")
+                    approotdir = window.mainAppConfig.rootDir + "/";
+
+                var appdivelement = document.createElement('div');
+                appdivelement.setAttribute("aurelia-app", approotdir + "main");
+                document.getElementById('app').appendChild(appdivelement);
+
+                System.import('aurelia-bootstrapper');
+            };
+
+        </script>
+
+        <div id="app" style="display: none; position: relative; top: 0; left: 0; z-index: 0;"></div>
+        <img id="loading" src="img/loading.svg" style="margin: auto; position: absolute; top: 0; left: 0; bottom: 0; right: 0; z-index: 500; display: block;"/>
+        
+    </body>
+</html>

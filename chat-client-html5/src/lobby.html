@@ -1,0 +1,112 @@
+<template>
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#/login" click.delegate="logout()"><span i18n="topbar.logout">Logout</span></a>
+        </div>
+
+        <div class="collapse navbar-collapse center-block" id="navbar-ex-collapse">
+
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                 <img i18n="topbar.flag-img"/>&nbsp;<span i18n="topbar.language">Language</span>&nbsp;<span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a href="#/lobby" click.delegate="changeLang('en')" i18n="topbar.english">English</a></li>
+                <li><a href="#/lobby" click.delegate="changeLang('zh')" i18n="topbar.chinese">Chinese</a></li>
+              </ul>
+            </li>
+          </ul>
+
+          <form class="navbar-form navbar-left" role="search">
+            <div class="form-group">
+              <label class="control-label" i18n="topbar.username">User</label>
+              <input type="text" class="form-control input-md" style="width: 130px" placeholder="" value.bind="userName" disabled>
+            </div>&nbsp;&nbsp;
+            <div class="form-group">
+              <label class="control-label" i18n="topbar.chatroom">Chatroom</label>
+              <input type="text" class="form-control input-md" style="width: 130px" placeholder="" value="" disabled>
+            </div>
+          </form>
+
+        </div>
+
+      </div>
+    </nav>
+
+    <div class="center-block" style="height: 690px; overflow: auto;">
+      
+      <table if.bind="!canShowRooms" style="width: 100%; height: 100%;">
+        <tr style="width: 100%; height: 100%;">
+          <td style="width: 100%; height: 100%; vertical-align: middle;">
+          <img src="./img/loading.svg" style="margin: 0 auto; display: block;"/>
+          </td>
+        </tr>
+      </table>
+
+      <table if.bind="canShowRooms" style="width: 100%; height: 100%;">
+      <template repeat.for="item of rooms">
+
+        <tr if.bind="$index % 3 === 0" style="width: 100%; height: 100%;">
+
+          <td repeat.for="i of 3" style="width: 33%; height: 100%; vertical-align: top;">
+
+            <div if.bind="$parent.$index + i < rooms.length - 1" class="panel panel-primary">
+              <div class="panel-heading">
+                <h3 class="panel-title">${rooms[$parent.$index + i].roomName}</h3>
+              </div>
+              <div class="panel-body" style="height: 180px;">
+                <table style="text-align: left; width: 100%;">
+                <tbody>
+                <tr>
+                <td style="vertical-align: top;">
+                  <span i18n="lobby.total">Total Users</span><span>: ${rooms[$parent.$index + i].userCount}</span>
+                </td>
+                <td style="vertical-align: top; text-align: right;">
+                  <button class="btn btn-success btn-lg btn-block pull-right" style="width: 90px;"
+                          click.delegate="enterRoom(rooms[$parent.$index + i].roomName)" 
+                          disabled.bind="messenger.isRequesting || router.isNavigating"
+                          i18n="lobby.enter">Enter</button>
+                </td>
+                </tr>
+                </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div if.bind="$parent.$index + i == rooms.length - 1" class="panel panel-primary">
+              <div class="panel-heading">
+                <h3 class="panel-title">:: <span i18n="lobby.create">Create New</span> ::</h3>
+              </div>
+              <div class="panel-body" style="text-align: center; height: 180px;">
+                <button class="btn btn-default" click.delegate="addRoom()">
+                    <img src="./img/add.png" />
+                </button>
+              </div>
+            </div>
+
+          </td>
+          
+        </tr>
+
+      </template>
+      </table>
+      
+    </div>
+
+    <div class="section container">
+        <div class="row">&nbsp;</div>
+        <div class="row">
+            <div class="alert alert-danger alert-dismissible fade-in" show.bind="!isEmptyAlertMessage" role="alert">
+                <button type="button" class="close" click.delegate="dismissAlertMessage()" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <strong>Error: </strong> ${alertMessage}
+            </div>
+        </div>
+    </div>
+
+</template>
