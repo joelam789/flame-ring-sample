@@ -1,6 +1,6 @@
 # chatroom client for html5
 
-This is a simple chatroom client built on Aurelia framework + TypeScript.
+This is a simple chatroom client built with [Aurelia](http://aurelia.io) + [TypeScript](http://www.typescriptlang.org).
 
 And maybe you could also find some sample code about how to use Aurelia in TypeScript.
 
