@@ -2,7 +2,7 @@
 
 This is a simple chatroom client built with [Aurelia](http://aurelia.io) + [TypeScript](http://www.typescriptlang.org).
 
-And maybe you could also find some sample code about how to use Aurelia in TypeScript.
+And here you could find some sample code about how to use Aurelia in TypeScript, too.
 
 # how to build the code
 
