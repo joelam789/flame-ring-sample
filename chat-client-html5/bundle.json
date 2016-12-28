@@ -1,0 +1,45 @@
+{
+  "force": true,
+  "baseURL": ".",
+  "configPath": "./config.js",
+  "bundles": {
+    "dist/bundle-app": {
+      "includes": [
+        "[dist/*.js]",
+        "dist/*.html!text",
+        "dist/*.css!text"
+      ],
+      "excludes": [
+        "config"
+      ],
+      "options": {
+        "inject": true,
+        "minify": true
+      }
+    },
+
+    "dist/bundle-vendor": {
+    "includes": [
+        "aurelia-bootstrapper",
+        "aurelia-dialog",
+        "aurelia-event-aggregator",
+        "aurelia-framework",
+        "aurelia-history-browser",
+        "aurelia-i18n",
+        "aurelia-loader-default",
+        "aurelia-pal-browser",
+        "aurelia-router",
+        "aurelia-templating-binding",
+        "aurelia-templating-router",
+        "core-js",
+        "i18next-xhr-backend",
+        "github:rstacruz/nprogress",
+        "text"
+      ],
+      "options": {
+        "inject": true,
+        "minify": true
+      }
+    }
+  }
+}

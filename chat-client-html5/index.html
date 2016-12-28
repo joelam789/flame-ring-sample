@@ -9,6 +9,10 @@
         <script src="jspm_packages/system.js"></script>
         <script src="config.js"></script>
 
+        <!-- the bundles of the app and vendor scripts -->
+        <script src="bundle-app.js"></script>
+        <script src="bundle-vendor.js"></script>
+
         <!-- actually you could install jquery and bootstrap by jspm, too -->
         <!-- this is just an example to show you how to include 3rd-party js libs directly -->
         <script src="js/jquery-3.1.1.min.js"></script>
@@ -18,6 +22,14 @@
         <script src="js/app-config.js"></script>
 
         <script>
+
+            // make every refresh action go back to the entry URL
+            var entryurlparts = window.location.href.split('#');
+            if (entryurlparts.length > 1) {
+                window.location.assign(entryurlparts[0]);
+                throw "The entry URL should not contain character '#'";
+            }
+            window.mainAppConfig.originalUrl = entryurlparts[0];
             
             // we would try to load correct theme (css) by url params
             function getUrlParamByName(name, url) {

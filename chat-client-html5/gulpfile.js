@@ -6,9 +6,12 @@ const sequence = require('run-sequence');
 const sourcemap = require('gulp-sourcemaps');
 const webserver = require('gulp-webserver');
 
+const fs = require("fs");
+const abundle = require('aurelia-bundler').bundle;
+
 const tsconfig = require('gulp-typescript').createProject('tsconfig.json');
 
-gulp.task('clean', function () {
+gulp.task('clear-all', function () {
     del.sync(["./dist/**/*"]);
 });
 
@@ -21,8 +24,27 @@ gulp.task('copy-lib', function () {
 
 gulp.task('copy-index', function () {
     return gulp.src([
-        "./index.html",
-        "./config.js"
+        "./index.html"
+        ])
+        .pipe(gulp.dest("./dist/"));
+});
+
+gulp.task('copy-config', function () {
+    return gulp.src(["./config.js"]).pipe(gulp.dest("./dist/"));
+});
+
+gulp.task('backup-config', function () {
+    return gulp.src(["./config.js"]).pipe(gulp.dest("./tmp/"));
+});
+
+gulp.task('restore-config', function () {
+    return gulp.src(["./tmp/config.js"]).pipe(gulp.dest("./"));
+});
+
+gulp.task('copy-bundle', function () {
+    return gulp.src([
+        "./bundle-app.js",
+        "./bundle-vendor.js"
         ])
         .pipe(gulp.dest("./dist/"));
 });
@@ -59,17 +81,46 @@ gulp.task("watch", function () {
 });
 
 gulp.task("rebuild", function () {
-    sequence('clean',
-            ['copy-lib', 'copy-index'],
+    sequence('clear-all',
+            ['copy-lib', 'copy-index', 'copy-config', 'copy-bundle'],
              'copy-template',
              'copy-resource',
              'build',
              'watch');
 });
 
+gulp.task("bundle", function () {
+    del.sync(["./dist/bundle-app.js"]);
+    del.sync(["./dist/bundle-vendor.js"]);
+    return abundle(JSON.parse(fs.readFileSync('./bundle.json', 'utf8')));
+});
+
+gulp.task('clean-up', function () {
+    del.sync(["dist/*.js.map"]);
+    del.sync(["dist/*.js", "!dist/config.js", "!dist/bundle-app.js", "!dist/bundle-vendor.js"]);
+    del.sync(["dist/*.html", "!dist/index.html"]);
+    del.sync(["tmp/**/*"]);
+    //del.sync(["dist/jspm_packages/github/**/*"]);
+    //del.sync(["dist/jspm_packages/npm/**/*"]);
+});
+
+gulp.task("release", function () {
+    sequence('clear-all',
+            ['copy-lib', 'copy-config'],
+             'copy-template',
+             'copy-resource',
+             'build',
+             'backup-config',
+             'bundle',
+             'copy-config',
+             'restore-config',
+             'copy-index',
+             'clean-up');
+});
+
 gulp.task("build-only", function () {
-    sequence('clean',
-            ['copy-lib', 'copy-index'],
+    sequence('clear-all',
+            ['copy-lib', 'copy-index', 'copy-config', 'copy-bundle'],
              'copy-template',
              'copy-resource',
              'build');
@@ -78,6 +129,7 @@ gulp.task("build-only", function () {
 gulp.task('start', function() {
   gulp.src('./')
   .pipe(webserver({
+      host: "0.0.0.0",
       port: 9090
     }));
 });
