@@ -11,6 +11,7 @@ import org.apache.ignite.IgniteCache;
 import org.apache.ignite.IgniteTransactions;
 import org.apache.ignite.cache.query.QueryCursor;
 import org.apache.ignite.cache.query.ScanQuery;
+import org.apache.ignite.cache.query.SqlFieldsQuery;
 import org.apache.ignite.transactions.Transaction;
 
 import org.flamering.component.Grid;
@@ -105,13 +106,22 @@ public class ChatRoomService extends BaseService {
 						return reply;
 					}
 					
+					/*
 					ChatSession userSession = sessionCache.get(userName); // reload it to make sure what we get is the latest one
 					if (userSession != null) userSession.setRoomName(roomName);
 					if (userSession == null || !sessionCache.replace(userName, session, userSession)) {
 						reply.setResult("User session data is not in sync.");
 						return reply;
 					}
+					*/
 					
+					QueryCursor<List<?>> result = sessionCache.query(new SqlFieldsQuery("UPDATE ChatSession set roomName = ? WHERE _key = ?")
+																			.setArgs(roomName, userName));
+					if (result == null || !result.iterator().hasNext()) {
+						reply.setResult("Failed to sync user session data.");
+						return reply;
+					}
+						
 					tx.commit();
 					
 				}
@@ -225,14 +235,21 @@ public class ChatRoomService extends BaseService {
 					
 					userList.addAll(chatRoom.getUsers());
 					
-					
+					/*
 					ChatSession userSession = sessionCache.get(userName); // reload it to make sure what we get is the latest one
 					if (userSession != null) userSession.setRoomName(roomName);
 					if (userSession == null || !sessionCache.replace(userName, session, userSession)) {
 						reply.setResult("User session data is not in sync.");
 						return reply;
 					}
+					*/
 					
+					QueryCursor<List<?>> result = sessionCache.query(new SqlFieldsQuery("UPDATE ChatSession set roomName = ? WHERE _key = ?")
+																			.setArgs(roomName, userName));
+					if (result == null || !result.iterator().hasNext()) {
+						reply.setResult("Failed to sync user session data.");
+						return reply;
+					}
 					
 					tx.commit();
 					
@@ -332,11 +349,19 @@ public class ChatRoomService extends BaseService {
 						System.out.println(new Date().toString() + " - Empty room removed: " + roomName);
 					}
 					
-					
+					/*
 					ChatSession userSession = sessionCache.get(userName); // reload it to make sure what we get is the latest one
 					if (userSession != null) userSession.setRoomName("");
 					if (userSession == null || !sessionCache.replace(userName, session, userSession)) {
 						reply.setResult("User session data is not in sync.");
+						return reply;
+					}
+					*/
+					
+					QueryCursor<List<?>> result = sessionCache.query(new SqlFieldsQuery("UPDATE ChatSession set roomName = ? WHERE _key = ?")
+																			.setArgs("", userName));
+					if (result == null || !result.iterator().hasNext()) {
+						reply.setResult("Failed to sync user session data.");
 						return reply;
 					}
 					

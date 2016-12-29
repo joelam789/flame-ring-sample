@@ -61,6 +61,7 @@
     
     <!-- internal services -->
     <bean id="network-service" class="org.flamering.service.NetworkService">
+    	<!-- external address of the network service -->
     	<property name="address" value="127.0.0.1"/>
     </bean>
     <bean id="network-event-service" class="org.flamering.sample.chat.common.NetworkEventHandler"/>

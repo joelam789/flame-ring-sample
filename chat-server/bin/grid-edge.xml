@@ -45,11 +45,13 @@
 		            <property name="cacheMode" value="REPLICATED"/>
 			        <property name="atomicityMode" value="TRANSACTIONAL"/>
 			        
-			        <property name="typeMetadata">
-				        <list>
-							<bean class="org.apache.ignite.cache.CacheTypeMetadata">
-							<property name="valueType" value="org.flamering.sample.chat.data.ChatSession"/>
-								<property name="queryFields">
+			        <property name="queryEntities">
+						<list>
+							<bean class="org.apache.ignite.cache.QueryEntity">
+								<property name="keyType" value="java.lang.String"/>
+								<property name="valueType" value="org.flamering.sample.chat.data.ChatSession"/>
+
+								<property name="fields">
 									<map>
 										<entry key="userName" value="java.lang.String"/>
 										<entry key="userRole" value="java.lang.String"/>
@@ -60,15 +62,21 @@
 										<entry key="remoteAddress" value="java.lang.String"/>
 									</map>
 								</property>
-								<property name="ascendingFields">
-									<map>
-										<entry key="userName" value="java.lang.String"/>
-										<entry key="sessionName" value="java.lang.String"/>
-									</map>
+							  
+								<property name="indexes">
+									<list>
+										<bean class="org.apache.ignite.cache.QueryIndex">
+											<constructor-arg value="userName"/>
+										</bean>
+										<bean class="org.apache.ignite.cache.QueryIndex">
+											<constructor-arg value="sessionName"/>
+										</bean>
+									</list>
 								</property>
+
 							</bean>
 						</list>
-			        </property>
+					</property>
 			         
 			        <!-- 
 			        <property name="expiryPolicyFactory">

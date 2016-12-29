@@ -1,7 +1,5 @@
 package org.flamering.sample.chat.data;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RoomSummary {
@@ -42,19 +40,4 @@ public class RoomSummary {
 		this.userCount = userCount;
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		
-		if (obj == null) return false;
-		if (obj == this) return true;
-		if (obj.getClass() != getClass()) return false;
-		
-		RoomSummary summary = (RoomSummary) obj;
-		return new EqualsBuilder()
-					.append(roomName, summary.roomName)
-					.append(creator, summary.creator)
-					.append(userCount, summary.userCount)
-					.isEquals();
-	}
-
 }

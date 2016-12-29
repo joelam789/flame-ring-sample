@@ -1,6 +1,6 @@
 package org.flamering.sample.chat.data;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
+//import org.apache.commons.lang3.builder.EqualsBuilder;
 
 public class ChatSession {
 
@@ -75,6 +75,7 @@ public class ChatSession {
 		this.remoteAddress = remoteAddress;
 	}
 	
+	/*
 	@Override
 	public boolean equals(Object obj) {
 		
@@ -93,6 +94,6 @@ public class ChatSession {
 					.append(remoteAddress, session.remoteAddress)
 					.isEquals();
 	}
-
+	*/
 	
 }
