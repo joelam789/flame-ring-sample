@@ -5,6 +5,6 @@ window.mainAppConfig = {
     
     defaultUserName: "sam",
 
-    rootDir: "dist", // our app's root directory
+    rootDir: "dist" // our app's root directory
 
 };

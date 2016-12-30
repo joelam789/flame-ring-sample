@@ -29,15 +29,15 @@ gulp.task('copy-index', function () {
         .pipe(gulp.dest("./dist/"));
 });
 
-gulp.task('copy-config', function () {
+gulp.task('copy-module-config', function () {
     return gulp.src(["./config.js"]).pipe(gulp.dest("./dist/"));
 });
 
-gulp.task('backup-config', function () {
+gulp.task('backup-module-config', function () {
     return gulp.src(["./config.js"]).pipe(gulp.dest("./tmp/"));
 });
 
-gulp.task('restore-config', function () {
+gulp.task('restore-module-config', function () {
     return gulp.src(["./tmp/config.js"]).pipe(gulp.dest("./"));
 });
 
@@ -76,23 +76,63 @@ gulp.task("build", () => {
 });
 
 gulp.task("watch", function () {
-    return gulp.watch(["./index.html", "./src/*.*", "./res/**/*"],
-                      ["copy-index", "copy-template", "copy-resource", "build"]);
+    return gulp.watch(["./index.html", "./app-config.json", "./src/*.*", "./res/**/*"],
+                      ["copy-index", "copy-template", "copy-resource", "build", "apply-app-config"]);
 });
 
 gulp.task("rebuild", function () {
     sequence('clear-all',
-            ['copy-lib', 'copy-index', 'copy-config', 'copy-bundle'],
+            ['copy-lib', 'copy-index', 'copy-module-config', 'copy-bundle'],
              'copy-template',
              'copy-resource',
              'build',
+             'apply-app-config',
              'watch');
 });
 
-gulp.task("bundle", function () {
+gulp.task("before-bundle", function () {
     del.sync(["./dist/bundle-app.js"]);
     del.sync(["./dist/bundle-vendor.js"]);
-    return abundle(JSON.parse(fs.readFileSync('./bundle.json', 'utf8')));
+
+    let appConfig = JSON.parse(fs.readFileSync('./app-config.json', 'utf8'));
+    if (appConfig.rootDir != undefined && appConfig.rootDir.length > 0 && appConfig.rootDir != "dist") {
+        return gulp.src([
+            "./dist/*.js", 
+            "./dist/*.html", 
+            "./dist/*.css"])
+        .pipe(gulp.dest("./" + appConfig.rootDir + "/"));
+    }
+});
+
+gulp.task("bundle", function () {
+    
+    let appConfig = JSON.parse(fs.readFileSync('./app-config.json', 'utf8'));
+    let bundleConfig = JSON.parse(fs.readFileSync('./bundle.json', 'utf8'));
+
+    if (appConfig.rootDir != undefined && appConfig.rootDir.length > 0) {
+        bundleConfig.bundles['dist/bundle-app'].includes = [
+            "[" + appConfig.rootDir + "/*.js]", 
+            appConfig.rootDir + "/*.html!text",
+            appConfig.rootDir + "/*.css!text"
+        ];
+    }
+
+    return abundle(bundleConfig);
+});
+
+gulp.task("after-bundle", function () {
+    let appConfig = JSON.parse(fs.readFileSync('./app-config.json', 'utf8'));
+    if (appConfig.rootDir != undefined && appConfig.rootDir.length > 0 && appConfig.rootDir != "dist") {
+        del.sync(["./" + appConfig.rootDir.split('/')[0] + "/**/*"]);
+        del.sync(["./" + appConfig.rootDir.split('/')[0]]);
+    }
+});
+
+gulp.task("apply-app-config", function () {
+    let appConfig = JSON.parse(fs.readFileSync('./app-config.json', 'utf8'));
+    let configCode = "window.mainAppConfig = JSON.parse('" + JSON.stringify(appConfig) + "');";
+    fs.writeFileSync('./dist/js/app-config.js', configCode, 'utf8');
+    
 });
 
 gulp.task('clean-up', function () {
@@ -100,30 +140,35 @@ gulp.task('clean-up', function () {
     del.sync(["dist/*.js", "!dist/config.js", "!dist/bundle-app.js", "!dist/bundle-vendor.js"]);
     del.sync(["dist/*.html", "!dist/index.html"]);
     del.sync(["tmp/**/*"]);
-    //del.sync(["dist/jspm_packages/github/**/*"]);
-    //del.sync(["dist/jspm_packages/npm/**/*"]);
+    del.sync(["./tmp"]);
+    del.sync(["dist/jspm_packages/github/**/*"]);
+    del.sync(["dist/jspm_packages/npm/**/*"]);
 });
 
 gulp.task("release", function () {
     sequence('clear-all',
-            ['copy-lib', 'copy-config'],
+            ['copy-lib', 'copy-module-config'],
              'copy-template',
              'copy-resource',
              'build',
-             'backup-config',
+             'backup-module-config',
+             'before-bundle',
              'bundle',
-             'copy-config',
-             'restore-config',
+             'copy-module-config',
+             'after-bundle',
+             'restore-module-config',
+             'apply-app-config',
              'copy-index',
              'clean-up');
 });
 
 gulp.task("build-only", function () {
     sequence('clear-all',
-            ['copy-lib', 'copy-index', 'copy-config', 'copy-bundle'],
+            ['copy-lib', 'copy-index', 'copy-module-config', 'copy-bundle'],
              'copy-template',
              'copy-resource',
-             'build');
+             'build',
+             'apply-app-config');
 });
 
 gulp.task('start', function() {
