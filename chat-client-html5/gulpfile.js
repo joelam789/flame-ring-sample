@@ -64,7 +64,7 @@ gulp.task('copy-resource', function () {
         .pipe(gulp.dest("./dist/"));
 });
 
-gulp.task("build", () => {
+gulp.task("compile", () => {
     return gulp.src([
         "./typings/index.d.ts",
         "./src/*.ts"
@@ -77,15 +77,23 @@ gulp.task("build", () => {
 
 gulp.task("watch", function () {
     return gulp.watch(["./index.html", "./app-config.json", "./src/*.*", "./res/**/*"],
-                      ["copy-index", "copy-template", "copy-resource", "build", "apply-app-config"]);
+                      ["build-main"]);
 });
 
-gulp.task("rebuild", function () {
+gulp.task("build-main", function () {
+    sequence('copy-index',
+             'copy-template',
+             'copy-resource',
+             'compile',
+             'apply-app-config');
+});
+
+gulp.task("build-and-watch", function () {
     sequence('clear-all',
             ['copy-lib', 'copy-index', 'copy-module-config', 'copy-bundle'],
              'copy-template',
              'copy-resource',
-             'build',
+             'compile',
              'apply-app-config',
              'watch');
 });
@@ -150,7 +158,7 @@ gulp.task("release", function () {
             ['copy-lib', 'copy-module-config'],
              'copy-template',
              'copy-resource',
-             'build',
+             'compile',
              'backup-module-config',
              'before-bundle',
              'bundle',
@@ -167,7 +175,7 @@ gulp.task("build-only", function () {
             ['copy-lib', 'copy-index', 'copy-module-config', 'copy-bundle'],
              'copy-template',
              'copy-resource',
-             'build',
+             'compile',
              'apply-app-config');
 });
 
@@ -179,4 +187,4 @@ gulp.task('start', function() {
     }));
 });
 
-gulp.task('default', ['rebuild']);
+gulp.task('default', ['build-and-watch']);
