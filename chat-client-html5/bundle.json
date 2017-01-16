@@ -10,7 +10,7 @@
         "dist/*.css!text"
       ],
       "excludes": [
-        "config"
+        "dist/config"
       ],
       "options": {
         "inject": true,

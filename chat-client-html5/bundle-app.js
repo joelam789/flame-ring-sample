@@ -1,2 +1,2 @@
 
-console.log("try to load app resource");
+console.log("try to load app views");

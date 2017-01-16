@@ -123,6 +123,9 @@ gulp.task("bundle", function () {
             appConfig.rootDir + "/*.html!text",
             appConfig.rootDir + "/*.css!text"
         ];
+        bundleConfig.bundles['dist/bundle-app'].excludes = [
+            appConfig.rootDir + "/config"
+        ];
     }
 
     return abundle(bundleConfig);
