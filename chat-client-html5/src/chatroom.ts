@@ -1,6 +1,6 @@
 
 import {autoinject, customElement} from 'aurelia-framework';
-import {EventAggregator} from 'aurelia-event-aggregator';
+import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {Router} from 'aurelia-router';
 
 import {DialogService} from 'aurelia-dialog';
@@ -29,6 +29,8 @@ export class ChatroomPage {
 
     users: Array<string> = [];
 
+    subscribers: Array<Subscription> = [];
+
     alertMessage: string = null;
 
     refreshTimer: any = null;
@@ -45,38 +47,8 @@ export class ChatroomPage {
                 public i18n: I18N, public chatState: ChatState, 
                 public messenger: Messenger, public eventChannel: EventAggregator) {
 
-        this.eventChannel.subscribe(UI.ExitRoom, data => {
-            if (data.message.toLowerCase() == "ok") {
-                console.log("back to lobby");
-                this.router.navigate("lobby"); // back to lobby
-            } else {
-                this.alertMessage = data.message; // show error
-            }
-        });
-
-        this.eventChannel.subscribe(UI.ComeIn, data => {
-            this.updateUserList();
-        });
-
-        this.eventChannel.subscribe(UI.GetOut, data => {
-            this.updateUserList();
-        });
-
-        this.eventChannel.subscribe(UI.Chat, data => {
-            if (this.chatHistory.length >= ChatroomPage.MAX_CHAT_HISTORY_LINE_COUNT) {
-                this.chatHistory.splice(0, 1);
-            }
-            this.chatHistory.push(data.message);
-            setTimeout(() => { // make it a little bit delay because aurelia needs some time to apply changes to UI
-                let elem = document.getElementById('chatbox');
-                if (elem != undefined && elem != null) elem.scrollTop = elem.scrollHeight - elem.clientHeight;
-            }, 80);
-            
-        });
-
-        this.eventChannel.subscribe(UI.Logout, data => {
-            this.logout();
-        });
+        this.chatHistory = [];
+        this.subscribers = [];
         
     }
 
@@ -89,11 +61,7 @@ export class ChatroomPage {
         this.userName = this.chatState.userName;
         this.roomName = this.chatState.currentRoom.name;
 
-        this.chatHistory = [];
-
         this.updateUserList();
-
-        this.messenger.processPendingMessages("chatroom");
 
         window.addEventListener('keypress', this.pressKeyCallback, false);
         
@@ -101,6 +69,52 @@ export class ChatroomPage {
 
     deactivate() {
         window.removeEventListener('keypress', this.pressKeyCallback);
+    }
+
+    attached() {
+
+        this.subscribers = [];
+
+        this.subscribers.push(this.eventChannel.subscribe(UI.ExitRoom, data => {
+            if (data.message.toLowerCase() == "ok") {
+                console.log("back to lobby");
+                this.router.navigate("lobby"); // back to lobby
+            } else {
+                this.alertMessage = data.message; // show error
+            }
+        }));
+
+        this.subscribers.push(this.eventChannel.subscribe(UI.ComeIn, data => {
+            this.updateUserList();
+        }));
+
+        this.subscribers.push(this.eventChannel.subscribe(UI.GetOut, data => {
+            this.updateUserList();
+        }));
+
+        this.subscribers.push(this.eventChannel.subscribe(UI.Chat, data => {
+            if (this.chatHistory.length >= ChatroomPage.MAX_CHAT_HISTORY_LINE_COUNT) {
+                this.chatHistory.splice(0, 1);
+            }
+            this.chatHistory.push(data.message);
+            setTimeout(() => { // make it a little bit delay because aurelia needs some time to apply changes to UI
+                let elem = document.getElementById('chatbox');
+                if (elem != undefined && elem != null) elem.scrollTop = elem.scrollHeight - elem.clientHeight;
+            }, 80);
+            
+        }));
+
+        this.subscribers.push(this.eventChannel.subscribe(UI.Logout, data => {
+            this.logout();
+        }));
+
+        this.messenger.processPendingMessages("chatroom");
+
+    }
+
+    detached() {
+        for (let item of this.subscribers) item.dispose();
+        this.subscribers = [];
     }
 
     get isEmptyAlertMessage() {

@@ -1,6 +1,6 @@
 
 import {autoinject} from 'aurelia-framework';
-import {EventAggregator} from 'aurelia-event-aggregator';
+import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {Router} from 'aurelia-router';
 
 import {App} from './app';
@@ -18,20 +18,15 @@ export class LoginPage {
     loginUrl: string = "127.0.0.1:11091";
     alertMessage: string = null;
 
+    subscribers: Array<Subscription> = [];
+
     constructor(public router: Router, public chatState: ChatState, 
                 public messenger: Messenger, public eventChannel: EventAggregator) {
                     
-        eventChannel.subscribe(UI.EnterLobby, data => {
-            if (data.message.toLowerCase() == "ok") {
-                console.log("jump to lobby...");
-                this.router.navigate("lobby"); // go to lobby
-            } else {
-                this.alertMessage = data.message;
-            }
-        });
-
         this.userName = App.config.defaultUserName;
         this.loginUrl = App.config.defaultLoginUrl;
+
+        this.subscribers = [];
 
     }
 
@@ -59,6 +54,23 @@ export class LoginPage {
         document.getElementById('app').style.display = 'block';
     }
 
+    attached() {
+        this.subscribers = [];
+        this.subscribers.push(this.eventChannel.subscribe(UI.EnterLobby, data => {
+            if (data.message.toLowerCase() == "ok") {
+                console.log("jump to lobby...");
+                this.router.navigate("lobby"); // go to lobby
+            } else {
+                this.alertMessage = data.message;
+            }
+        }));
+    }
+
+    detached() {
+        for (let item of this.subscribers) item.dispose();
+        this.subscribers = [];
+    }
+
     dismissAlertMessage() {
         this.alertMessage = null;
     }
@@ -78,8 +90,8 @@ export class LoginPage {
                 this.chatState.serverAddress = reply.server_uri;
                 this.messenger.enterLobby();
             }
-        }, () => {
-            this.alertMessage = "Failed to login";
+        }, (errmsg) => {
+            this.alertMessage = "Failed to login: " + errmsg;
         })
         
     }

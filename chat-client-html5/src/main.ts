@@ -29,7 +29,7 @@ export function configure(aurelia: Aurelia) {
 			debug : false
         });
     })
-	.globalResources(['./loading-indicator'])
+	//.globalResources(['./loading-indicator']) // will load it with "require"
 	;
 
 	aurelia.start().then(() => aurelia.setRoot());

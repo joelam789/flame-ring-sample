@@ -2,8 +2,6 @@
 
   "defaultLoginUrl": "http://localhost:11091",
 
-  "defaultUserName": "sam",
-
-  "rootDir": "dist"
+  "defaultUserName": "sam"
 
 }

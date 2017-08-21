@@ -1,6 +1,6 @@
 
 import {autoinject, customElement} from 'aurelia-framework';
-import {EventAggregator} from 'aurelia-event-aggregator';
+import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {Router} from 'aurelia-router';
 
 import {DialogService} from 'aurelia-dialog';
@@ -18,6 +18,8 @@ export class LobbyPage {
 
     rooms: Array<RoomSummary> = [];
 
+    subscribers: Array<Subscription> = [];
+
     alertMessage: string = null;
 
     refreshedRooms: boolean = false;
@@ -28,35 +30,8 @@ export class LobbyPage {
                 public i18n: I18N, public chatState: ChatState, 
                 public messenger: Messenger, public eventChannel: EventAggregator) {
 
-        this.eventChannel.subscribe(UI.GetRoomList, data => {
-            this.rooms = JSON.parse(JSON.stringify(this.chatState.rooms));
-            this.rooms.push(new RoomSummary()); // add a fake one
-            this.refreshedRooms = true;
-        });
-
-        this.eventChannel.subscribe(UI.CreateNewRoom, data => {
-            if (data.result.message.toLowerCase() == "ok") {
-                console.log("created a new room: " + data.result.room);
-                this.router.navigate("chatroom"); // go to chatroom
-            } else {
-                console.log("failed to create a new room: " + data.result.message);
-                this.alertMessage = data.result.message;
-            }
-        });
-
-        this.eventChannel.subscribe(UI.EnterRoom, data => {
-            if (data.result.message.toLowerCase() == "ok") {
-                console.log("jump to chatroom: " + data.result.room);
-                this.router.navigate("chatroom"); // go to chatroom
-            } else {
-                console.log("failed to enter a room: " + data.result.message);
-                this.alertMessage = data.result.message;
-            }
-        });
-
-        this.eventChannel.subscribe(UI.Logout, data => {
-            this.logout();
-        });
+        this.rooms = [];
+        this.subscribers = [];
         
     }
 
@@ -72,8 +47,6 @@ export class LobbyPage {
         this.rooms.push(new RoomSummary()); // add a fake one
 
         if (this.rooms.length > 1) this.refreshedRooms = true;
-
-        this.messenger.processPendingMessages("lobby");
 
         if (this.refreshTimer != null) {
             clearInterval(this.refreshTimer);
@@ -92,6 +65,48 @@ export class LobbyPage {
         }
         this.rooms = [];
         this.refreshedRooms = false;
+    }
+
+    attached() {
+
+        this.subscribers = [];
+
+        this.subscribers.push(this.eventChannel.subscribe(UI.GetRoomList, data => {
+            this.rooms = JSON.parse(JSON.stringify(this.chatState.rooms));
+            this.rooms.push(new RoomSummary()); // add a fake one
+            this.refreshedRooms = true;
+        }));
+
+        this.subscribers.push(this.eventChannel.subscribe(UI.CreateNewRoom, data => {
+            if (data.result.message.toLowerCase() == "ok") {
+                console.log("created a new room: " + data.result.room);
+                this.router.navigate("chatroom"); // go to chatroom
+            } else {
+                console.log("failed to create a new room: " + data.result.message);
+                this.alertMessage = data.result.message;
+            }
+        }));
+
+        this.subscribers.push(this.eventChannel.subscribe(UI.EnterRoom, data => {
+            if (data.result.message.toLowerCase() == "ok") {
+                console.log("jump to chatroom: " + data.result.room);
+                this.router.navigate("chatroom"); // go to chatroom
+            } else {
+                console.log("failed to enter a room: " + data.result.message);
+                this.alertMessage = data.result.message;
+            }
+        }));
+
+        this.subscribers.push(this.eventChannel.subscribe(UI.Logout, data => {
+            this.logout();
+        }));
+
+        this.messenger.processPendingMessages("lobby");
+    }
+
+    detached() {
+        for (let item of this.subscribers) item.dispose();
+        this.subscribers = [];
     }
 
     get canShowRooms() {
@@ -113,7 +128,7 @@ export class LobbyPage {
     addRoom() {
         console.log("going to create a new room");
         this.dialogService.open({viewModel: CreateNewChatroomDialog, model: "" })
-        .then(response => {
+        .whenClosed((response) => {
             console.log(response);
             if (!response.wasCancelled && response.output.length > 0) {
                 console.log("going to add a new room: " + response.output);

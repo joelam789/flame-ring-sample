@@ -41,18 +41,17 @@ gulp.task('restore-module-config', function () {
     return gulp.src(["./tmp/config.js"]).pipe(gulp.dest("./"));
 });
 
-gulp.task('copy-bundle', function () {
-    return gulp.src([
-        "./bundle-app.js",
-        "./bundle-vendor.js"
-        ])
-        .pipe(gulp.dest("./dist/"));
+gulp.task('create-fake-bundle', function () {
+    //fs.closeSync(fs.openSync('./dist/bundle-app.js', 'a'));
+    //fs.closeSync(fs.openSync('./dist/bundle-vendor.js', 'a'));
+    fs.writeFileSync('./dist/bundle-app.js', "console.log('fake app bundle is loaded');", 'utf8');
+    fs.writeFileSync('./dist/bundle-vendor.js', "console.log('fake vendor bundle is loaded');", 'utf8');
 });
 
 gulp.task('copy-template', function () {
     return gulp.src([
-        "./src/*.html",
-        "./src/*.css"
+        "./src/**/*.html",
+        "./src/**/*.css"
         ])
         .pipe(gulp.dest("./dist/"));
 });
@@ -64,16 +63,41 @@ gulp.task('copy-resource', function () {
         .pipe(gulp.dest("./dist/"));
 });
 
-gulp.task("compile", () => {
+gulp.task("transpile", () => {
     return gulp.src([
         "./typings/index.d.ts",
-        "./src/*.ts"
+        "./src/**/*.ts"
     ])
     .pipe(sourcemap.init({ loadMaps: true }))
     .pipe(tsconfig()).js
     .pipe(sourcemap.write("./", {includeContent: false, sourceRoot: '../src'}))
     .pipe(gulp.dest("./dist/"));
 });
+
+//gulp.task("minify-js", () => {
+//    return gulp.src([
+//        "./dist/**/*.js"
+//    ])
+//    .pipe(minifyjs({
+//        ext: { min: '.js' },
+//        mangle: false,
+//        noSource: true,
+//        exclude: ['node_modules', 'jspm_packages'],
+//        ignoreFiles: ['-min.js']
+//    }))
+//    .pipe(gulp.dest('./dist'));
+//});
+
+//gulp.task("minify-html", () => {
+//    return gulp.src([
+//        "./src/**/*.html"
+//    ])
+//    .pipe(minifyhtml({
+//        collapseWhitespace: true,
+//        removeComments: true
+//    }))
+//    .pipe(gulp.dest('./dist'));
+//});
 
 gulp.task("watch", function () {
     return gulp.watch(["./index.html", "./app-config.json", "./src/*.*", "./res/**/*"],
@@ -84,74 +108,38 @@ gulp.task("build-main", function () {
     sequence('copy-index',
              'copy-template',
              'copy-resource',
-             'compile',
+             'transpile',
              'apply-app-config');
 });
 
 gulp.task("build-and-watch", function () {
     sequence('clear-all',
-            ['copy-lib', 'copy-index', 'copy-module-config', 'copy-bundle'],
+            ['copy-lib', 'copy-index', 'copy-module-config', 'create-fake-bundle'],
              'copy-template',
              'copy-resource',
-             'compile',
+             'transpile',
              'apply-app-config',
              'watch');
 });
 
-gulp.task("before-bundle", function () {
-    del.sync(["./dist/bundle-app.js"]);
-    del.sync(["./dist/bundle-vendor.js"]);
-
-    let appConfig = JSON.parse(fs.readFileSync('./app-config.json', 'utf8'));
-    if (appConfig.rootDir != undefined && appConfig.rootDir.length > 0 && appConfig.rootDir != "dist") {
-        return gulp.src([
-            "./dist/*.js", 
-            "./dist/*.html", 
-            "./dist/*.css"])
-        .pipe(gulp.dest("./" + appConfig.rootDir + "/"));
-    }
-});
-
 gulp.task("bundle", function () {
-    
     let appConfig = JSON.parse(fs.readFileSync('./app-config.json', 'utf8'));
     let bundleConfig = JSON.parse(fs.readFileSync('./bundle.json', 'utf8'));
-
-    if (appConfig.rootDir != undefined && appConfig.rootDir.length > 0) {
-        bundleConfig.bundles['dist/bundle-app'].includes = [
-            "[" + appConfig.rootDir + "/*.js]", 
-            appConfig.rootDir + "/*.html!text",
-            appConfig.rootDir + "/*.css!text"
-        ];
-        bundleConfig.bundles['dist/bundle-app'].excludes = [
-            appConfig.rootDir + "/config"
-        ];
-    }
-
     return abundle(bundleConfig);
-});
-
-gulp.task("after-bundle", function () {
-    let appConfig = JSON.parse(fs.readFileSync('./app-config.json', 'utf8'));
-    if (appConfig.rootDir != undefined && appConfig.rootDir.length > 0 && appConfig.rootDir != "dist") {
-        del.sync(["./" + appConfig.rootDir.split('/')[0] + "/**/*"]);
-        del.sync(["./" + appConfig.rootDir.split('/')[0]]);
-    }
 });
 
 gulp.task("apply-app-config", function () {
     let appConfig = JSON.parse(fs.readFileSync('./app-config.json', 'utf8'));
     let configCode = "window.mainAppConfig = JSON.parse('" + JSON.stringify(appConfig) + "');";
     fs.writeFileSync('./dist/js/app-config.js', configCode, 'utf8');
-    
 });
 
 gulp.task('clean-up', function () {
     del.sync(["dist/*.js.map"]);
     del.sync(["dist/*.js", "!dist/config.js", "!dist/bundle-app.js", "!dist/bundle-vendor.js"]);
     del.sync(["dist/*.html", "!dist/index.html"]);
-    del.sync(["tmp/**/*"]);
-    del.sync(["./tmp"]);
+    del.sync(["tmp/**/*"]); //del.sync(["./tmp"]);
+    try { del.sync(["tmp/**/*"]); del.sync(["./tmp"]); } catch(err) { }
     del.sync(["dist/jspm_packages/github/**/*"]);
     del.sync(["dist/jspm_packages/npm/**/*"]);
 });
@@ -161,12 +149,10 @@ gulp.task("release", function () {
             ['copy-lib', 'copy-module-config'],
              'copy-template',
              'copy-resource',
-             'compile',
+             'transpile',
              'backup-module-config',
-             'before-bundle',
              'bundle',
              'copy-module-config',
-             'after-bundle',
              'restore-module-config',
              'apply-app-config',
              'copy-index',
@@ -175,10 +161,10 @@ gulp.task("release", function () {
 
 gulp.task("build-only", function () {
     sequence('clear-all',
-            ['copy-lib', 'copy-index', 'copy-module-config', 'copy-bundle'],
+            ['copy-lib', 'copy-index', 'copy-module-config', 'create-fake-bundle'],
              'copy-template',
              'copy-resource',
-             'compile',
+             'transpile',
              'apply-app-config');
 });
 

@@ -1,7 +1,8 @@
     
 <template>
 
-  <require from="./css/styles.css"></require>
+  <require from="css/styles.css"></require>
+  <require from="loading-indicator"></require>
 
   <loading-indicator loading.bind="router.isNavigating || messenger.isRequesting"></loading-indicator>
 

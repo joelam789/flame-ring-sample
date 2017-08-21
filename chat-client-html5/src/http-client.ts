@@ -3,21 +3,27 @@
 
 export class HttpClient {
     
-    static getJSON(url: string, callback: (json: any)=>void = null, onerror: ()=>void = null) {
-        $.getJSON(url, (data) => {
-            if (callback != null) callback(data);
+    static getJSON(url: string, data?: any, callback?: (json: any)=>void, onerror?: (errmsg: string)=>void) {
+        $.getJSON(url, data, (ret) => {
+            if (callback != null) callback(ret);
         })
-        .fail(() => {
-            if (onerror != null) onerror();
+        .fail((jqxhr, textStatus, error) => {
+            console.log(jqxhr);
+            console.log(textStatus);
+            console.log(error);
+            if (onerror != null) onerror(textStatus);
         });
     }
 
-    static postText(url: string, text: string, callback: (reply: any)=>void = null, onerror: ()=>void = null) {
+    static postText(url: string, text: string, callback: (reply: any)=>void = null, onerror: (errmsg: string)=>void = null) {
         $.post(url, text, (response) => {
             if (callback != null) callback(response);
         }, 'text')
-        .fail(function (jqxhr, textStatus, error) {
-            if (onerror != null) onerror();
+        .fail((jqxhr, textStatus, error) => {
+            console.log(jqxhr);
+            console.log(textStatus);
+            console.log(error);
+            if (onerror != null) onerror(textStatus);
         });
     }
 

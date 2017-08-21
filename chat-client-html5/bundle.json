@@ -1,16 +1,16 @@
 {
   "force": true,
-  "baseURL": ".",
-  "configPath": "./config.js",
+  "baseURL": "dist",
+  "configPath": "config.js",
   "bundles": {
-    "dist/bundle-app": {
+    "bundle-app": {
       "includes": [
-        "[dist/*.js]",
-        "dist/*.html!text",
-        "dist/*.css!text"
+        "[*.js]",
+        "*.html!text",
+        "*.css!text"
       ],
       "excludes": [
-        "dist/config"
+        "config"
       ],
       "options": {
         "inject": true,
@@ -18,24 +18,28 @@
       }
     },
 
-    "dist/bundle-vendor": {
-    "includes": [
-        "aurelia-bootstrapper",
-        "aurelia-dialog",
-        "aurelia-event-aggregator",
-        "aurelia-framework",
-        "aurelia-i18n",
-        "aurelia-router",
-        "aurelia-templating-binding",
-        "aurelia-templating-router",
-        "aurelia-loader-default",
-        "aurelia-history-browser",
-        "aurelia-pal-browser",
-        "core-js",
-        "i18next-xhr-backend",
-        "github:rstacruz/nprogress",
-        "text"
-      ],
+    "bundle-vendor": {
+      "includes": [
+          "aurelia-bootstrapper",
+          "aurelia-dialog",
+          "aurelia-event-aggregator",
+          "aurelia-framework",
+          "aurelia-i18n",
+          "aurelia-router",
+          "aurelia-templating-binding",
+          "aurelia-templating-resources",
+          "aurelia-templating-router",
+          "aurelia-loader-default",
+          "aurelia-history-browser",
+          "aurelia-pal",
+          "aurelia-pal-browser",
+          "core-js",
+          "i18next",
+          "i18next-xhr-backend",
+          "intl",
+          "nprogress",
+          "text"
+        ],
       "options": {
         "inject": true,
         "minify": true
